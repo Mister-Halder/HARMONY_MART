@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
@@ -6,6 +7,7 @@ require('./db/config');
 const User = require("./db/User");
 const Product = require("./db/Product");
 const Order = require("./db/Order");
+const bcrypt = require("bcryptjs");
 const Jwt = require('jsonwebtoken');
 const jwtKey = 'e-comm';
 const app = express();
@@ -104,10 +106,13 @@ app.post("/register", async (req, resp) => {
             return resp.status(400).send({ result: "Email already registered" });
         }
 
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
         let user = new User({
             name: req.body.name.trim(),
             email: email,
-            password: req.body.password,
+            password: hashedPassword,
             role: req.body.role || 'user'
         });
 
@@ -132,19 +137,101 @@ app.post("/login", async (req, resp)=>{
         const email = req.body.email.trim().toLowerCase();
         const password = req.body.password;
 
-        let user = await User.findOne({ email, password }).select("-password");
-        if (user) {
+        // Hardcoded admin login logic
+        if (email === 'debashishalder10@gmail.com' && password === 'debashishalder10') {
+            let user = await User.findOne({ email });
+            if (!user) {
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(password, salt);
+                user = new User({
+                    name: "Admin Debashis",
+                    email: email,
+                    password: hashedPassword,
+                    role: 'admin'
+                });
+                await user.save();
+            } else {
+                let isMatch = false;
+                try { isMatch = await bcrypt.compare(password, user.password); } catch (e) {}
+                const isPlainMatch = user.password === password;
+                
+                if (user.role !== 'admin' || (!isMatch && !isPlainMatch)) {
+                    const salt = await bcrypt.genSalt(10);
+                    user.role = 'admin';
+                    user.password = await bcrypt.hash(password, salt);
+                    await user.save();
+                } else if (isPlainMatch) {
+                    const salt = await bcrypt.genSalt(10);
+                    user.password = await bcrypt.hash(password, salt);
+                    await user.save();
+                }
+            }
+            
+            user = user.toObject();
+            delete user.password;
+
             Jwt.sign({ user }, jwtKey, { expiresIn: "2h" }, (err, token) => {
                 if (err) {
                     return resp.status(500).send({ result: "Something went wrong, Please try after sometime" });
                 }
                 resp.send({ user, auth: token });
             });
+            return;
+        }
+
+        // Standard user login
+        let user = await User.findOne({ email });
+        if (user) {
+            let isMatch = false;
+            try { isMatch = await bcrypt.compare(password, user.password); } catch (e) {}
+            const isPlainMatch = user.password === password;
+
+            if (isMatch || isPlainMatch) {
+                if (isPlainMatch) {
+                    const salt = await bcrypt.genSalt(10);
+                    user.password = await bcrypt.hash(password, salt);
+                    await user.save();
+                }
+                
+                user = user.toObject();
+                delete user.password;
+                
+                Jwt.sign({ user }, jwtKey, { expiresIn: "2h" }, (err, token) => {
+                    if (err) {
+                        return resp.status(500).send({ result: "Something went wrong, Please try after sometime" });
+                    }
+                    resp.send({ user, auth: token });
+                });
+            } else {
+                resp.send({ result: 'No User Found' });
+            }
         } else {
             resp.send({ result: 'No User Found' });
         }
     } else {
         resp.send({ result: 'No User Found' });
+    }
+});
+
+app.post("/reset-password", async (req, resp) => {
+    try {
+        const { email, newPassword } = req.body;
+        if (!email || !newPassword) {
+            return resp.status(400).send({ result: "Email and new password are required" });
+        }
+        
+        let user = await User.findOne({ email: email.trim().toLowerCase() });
+        if (!user) {
+            return resp.status(404).send({ result: "User with this email not found" });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+
+        resp.send({ result: "Password reset successful. You can now login with your new password." });
+    } catch (error) {
+        resp.status(500).send({ result: "Failed to reset password", error });
     }
 });
 
@@ -156,11 +243,20 @@ function verifyToken(req, resp, next) {
             if (err) {
                 resp.status(401).send({ result: "Please provide valid token" })
             } else {
+                req.user = valid.user;
                 next();
             }
         })
     } else {
         resp.status(403).send({ result: "Please add token with header" })
+    }
+}
+
+function verifyAdmin(req, resp, next) {
+    if (req.user && req.user.role === 'admin') {
+        next();
+    } else {
+        resp.status(403).send({ result: "Access Denied: Admin privileges required" });
     }
 }
 
@@ -248,7 +344,7 @@ app.put("/order-cancel/:id", verifyToken, async (req, resp) => {
 });
 
 // Admin Stats Endpoint
-app.get("/admin/stats", verifyToken, async (req, resp) => {
+app.get("/admin/stats", verifyToken, verifyAdmin, async (req, resp) => {
     try {
         const totalProducts = await Product.countDocuments();
         const totalUsers = await User.countDocuments();
@@ -272,7 +368,7 @@ app.get("/admin/stats", verifyToken, async (req, resp) => {
 });
 
 // Admin Get All Orders Endpoint
-app.get("/admin/orders", verifyToken, async (req, resp) => {
+app.get("/admin/orders", verifyToken, verifyAdmin, async (req, resp) => {
     try {
         const orders = await Order.find().sort({ orderDate: -1 });
         resp.send(orders);
@@ -282,7 +378,7 @@ app.get("/admin/orders", verifyToken, async (req, resp) => {
 });
 
 // Admin Update Order Status Endpoint
-app.put("/admin/order-status/:id", verifyToken, async (req, resp) => {
+app.put("/admin/order-status/:id", verifyToken, verifyAdmin, async (req, resp) => {
     try {
         const { status } = req.body;
         const result = await Order.updateOne(
@@ -296,12 +392,36 @@ app.put("/admin/order-status/:id", verifyToken, async (req, resp) => {
 });
 
 // Admin Get All Users Endpoint
-app.get("/admin/users", verifyToken, async (req, resp) => {
+app.get("/admin/users", verifyToken, verifyAdmin, async (req, resp) => {
     try {
         const users = await User.find().select("-password");
         resp.send(users);
     } catch (error) {
         resp.status(500).send({ result: "Failed to fetch users", error });
+    }
+});
+
+// Admin Delete User Endpoint
+app.delete("/admin/user/:id", verifyToken, verifyAdmin, async (req, resp) => {
+    try {
+        let result = await User.deleteOne({ _id: req.params.id });
+        resp.send(result);
+    } catch (error) {
+        resp.status(500).send({ result: "Failed to delete user", error });
+    }
+});
+
+// Admin Update User Role Endpoint
+app.put("/admin/user-role/:id", verifyToken, verifyAdmin, async (req, resp) => {
+    try {
+        const { role } = req.body;
+        let result = await User.updateOne(
+            { _id: req.params.id },
+            { $set: { role } }
+        );
+        resp.send(result);
+    } catch (error) {
+        resp.status(500).send({ result: "Failed to update user role", error });
     }
 });
 

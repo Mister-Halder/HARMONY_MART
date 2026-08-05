@@ -44,7 +44,7 @@ const UpdateProduct = () => {
         }
 
         // Sanitize price (remove currency symbol or commas if any)
-        const cleanPrice = String(price).replace(/[$,]/g, '');
+        const cleanPrice = String(price).replace(/[₹$,]/g, '');
         const parsedPrice = parseFloat(cleanPrice);
         if (isNaN(parsedPrice) || parsedPrice < 0) {
             setError(true);

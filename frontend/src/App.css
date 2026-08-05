@@ -90,19 +90,19 @@
 }
 
 .logo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  height: 45px;
+  width: auto;
+  border-radius: 8px;
   margin-right: 25px;
-  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
   animation: floatProfileSimple 4s ease-in-out infinite;
   transition: all 0.3s ease;
   cursor: pointer;
+  object-fit: contain;
+  mix-blend-mode: screen;
 }
 
 .logo:hover {
     transform: scale(1.05);
-    box-shadow: 0 8px 15px rgba(99, 102, 241, 0.5);
 }
 
 @keyframes floatProfileSimple {
@@ -149,8 +149,8 @@
 }
 
 .register:hover, .login:hover, .product:hover {
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 81, 47, 0.15);
+    border-color: rgba(255, 81, 47, 0.4);
 }
 
 
@@ -181,15 +181,15 @@
 
 .inputBox:hover {
     background: rgba(30, 41, 59, 0.6); /* Softer glass-like background */
-    border-color: rgba(99, 102, 241, 0.6);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); /* Soft glow */
+    border-color: rgba(255, 81, 47, 0.6);
+    box-shadow: 0 4px 12px rgba(255, 81, 47, 0.15); /* Soft glow */
     transform: translateY(-2px); /* Tiny lift up */
 }
 
 .inputBox:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 3px rgba(255, 81, 47, 0.2);
 }
 
 .inputBox::placeholder {
@@ -208,12 +208,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 15px rgba(255, 81, 47, 0.4);
 }
 
 .appButton:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    box-shadow: 0 6px 20px rgba(255, 81, 47, 0.6);
 }
 
 .appButton:active {
@@ -298,8 +298,8 @@
 
 .product-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 81, 47, 0.15);
+    border-color: rgba(255, 81, 47, 0.5);
 }
 
 .product-badge {
@@ -313,7 +313,7 @@
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.5px;
-    box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 4px 10px rgba(221, 36, 118, 0.3);
 }
 
 .product-name {
@@ -373,7 +373,7 @@
 }
 
 .edit-btn {
-    background-color: rgba(99, 102, 241, 0.15);
+    background-color: rgba(255, 81, 47, 0.15);
     color: var(--primary-color);
 }
 

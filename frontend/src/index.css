@@ -1,8 +1,8 @@
 :root {
-  --primary-color: #6366f1;
-  --secondary-color: #8b5cf6;
-  --bg-color: #0f172a;
-  --card-bg: rgba(30, 41, 59, 0.7);
+  --primary-color: #FF512F;
+  --secondary-color: #DD2476;
+  --bg-color: #0A0910;
+  --card-bg: rgba(25, 23, 33, 0.75);
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --error-color: #ef4444;
@@ -30,8 +30,8 @@ body {
   background-color: var(--bg-color);
   color: var(--text-primary);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(255, 81, 47, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(221, 36, 118, 0.15) 0px, transparent 50%);
   background-attachment: fixed;
   min-height: 100vh;
 }

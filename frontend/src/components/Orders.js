@@ -9,7 +9,7 @@ const Orders = () => {
 
     const formatPrice = (price) => {
         if (!price) return "0.00";
-        const clean = String(price).replace(/[$,]/g, '');
+        const clean = String(price).replace(/[₹$,]/g, '');
         const num = parseFloat(clean);
         return isNaN(num) ? "0.00" : num.toFixed(2);
     };
@@ -176,7 +176,7 @@ const Orders = () => {
                                             {item.company && <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginLeft: '10px' }}>by {item.company}</span>}
                                         </div>
                                         <div style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                                            {item.quantity} x ${formatPrice(item.price)}
+                                            {item.quantity} x ₹{formatPrice(item.price)}
                                         </div>
                                     </div>
                                 ))}
@@ -211,7 +211,7 @@ const Orders = () => {
                             }}>
                                 <span style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>Order Total</span>
                                 <span style={{ fontSize: '1.4rem', fontWeight: '700', color: 'var(--primary-color)' }}>
-                                    ${formatPrice(order.totalAmount)}
+                                    ₹{formatPrice(order.totalAmount)}
                                 </span>
                             </div>
                         </div>

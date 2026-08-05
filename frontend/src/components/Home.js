@@ -69,7 +69,7 @@ const Home = () => {
 
     const formatPrice = (price) => {
         if (!price) return "0.00";
-        const clean = String(price).replace(/[$,]/g, '');
+        const clean = String(price).replace(/[₹$,]/g, '');
         const num = parseFloat(clean);
         return isNaN(num) ? "0.00" : num.toFixed(2);
     };
@@ -193,7 +193,7 @@ const Home = () => {
                         <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)', padding: '25px', borderRadius: '20px', backdropFilter: 'blur(10px)', boxShadow: 'var(--glass-shadow)', position: 'relative', overflow: 'hidden' }}>
                             <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600' }}>Gross Store Sales</div>
                             <div style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '12px', color: 'var(--success-color)' }}>
-                                ${formatPrice(stats.totalSales)}
+                                ₹{formatPrice(stats.totalSales)}
                             </div>
                             <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '8px' }}>Calculated from order revenues</div>
                         </div>
@@ -387,7 +387,7 @@ const Home = () => {
                                                 <td style={{ padding: '12px' }}>{new Date(order.orderDate).toLocaleDateString()}</td>
                                                 <td style={{ padding: '12px', fontSize: '0.85rem', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{order._id}</td>
                                                 <td style={{ padding: '12px', fontSize: '0.85rem', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{order.userId}</td>
-                                                <td style={{ padding: '12px', color: 'var(--success-color)', fontWeight: '700' }}>${formatPrice(order.totalAmount)}</td>
+                                                <td style={{ padding: '12px', color: 'var(--success-color)', fontWeight: '700' }}>₹{formatPrice(order.totalAmount)}</td>
                                                 <td style={{ padding: '12px' }}>
                                                     <span style={{
                                                         background: order.status === 'Delivered' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(99, 102, 241, 0.15)',
@@ -702,7 +702,7 @@ const Home = () => {
                                         <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', alignSelf: 'flex-start', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px', marginBottom: '10px' }}>{item.category}</div>
                                         <h3 className="product-name" style={{ textAlign: 'left', fontSize: '1.2rem', minHeight: '44px', margin: '5px 0' }}>{item.name}</h3>
                                         <div className="product-company" style={{ textAlign: 'left', marginBottom: '15px' }}>by <span>{item.company}</span></div>
-                                        <div className="product-price" style={{ textAlign: 'left', fontSize: '1.8rem', color: 'var(--success-color)', marginBottom: '20px' }}>${formatPrice(item.price)}</div>
+                                        <div className="product-price" style={{ textAlign: 'left', fontSize: '1.8rem', color: 'var(--success-color)', marginBottom: '20px' }}>₹{formatPrice(item.price)}</div>
                                         
                                         <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
                                             <button 
@@ -753,7 +753,7 @@ const Home = () => {
                         <div style={{ textAlign: 'center', padding: '15px' }}>
                             <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🚀</div>
                             <h5 style={{ fontSize: '1.05rem', fontWeight: '700', marginBottom: '8px' }}>Free Worldwide Shipping</h5>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>Free express shipping on all orders over $75.</p>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>Free express shipping on all orders over ₹75.</p>
                         </div>
                         <div style={{ textAlign: 'center', padding: '15px' }}>
                             <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🔒</div>

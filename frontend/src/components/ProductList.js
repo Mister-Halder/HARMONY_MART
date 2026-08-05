@@ -46,7 +46,7 @@ const ProductList = () => {
                 
                 // Dynamically calculate the maximum catalog price
                 const prices = result.map(p => {
-                    const clean = String(p.price).replace(/[$,]/g, '');
+                    const clean = String(p.price).replace(/[₹$,]/g, '');
                     const num = parseFloat(clean);
                     return isNaN(num) ? 0 : num;
                 });
@@ -105,7 +105,7 @@ const ProductList = () => {
         // 3. Price Filter (show products with price <= priceVal)
         if (priceVal !== undefined) {
             filtered = filtered.filter(p => {
-                const clean = String(p.price).replace(/[$,]/g, '');
+                const clean = String(p.price).replace(/[₹$,]/g, '');
                 const num = parseFloat(clean);
                 const itemPrice = isNaN(num) ? 0 : num;
                 return itemPrice <= priceVal;
@@ -166,7 +166,7 @@ const ProductList = () => {
 
     const formatPrice = (price) => {
         if (!price) return "0.00";
-        const clean = String(price).replace(/[$,]/g, '');
+        const clean = String(price).replace(/[₹$,]/g, '');
         const num = parseFloat(clean);
         return isNaN(num) ? "0.00" : num.toFixed(2);
     };
@@ -355,7 +355,7 @@ const ProductList = () => {
                                 borderRadius: '12px',
                                 border: '1px solid rgba(99, 102, 241, 0.3)'
                             }}>
-                                Up to ${priceRange.toFixed(2)}
+                                Up to ₹{priceRange.toFixed(2)}
                             </span>
                         </div>
                         <input 
@@ -376,8 +376,8 @@ const ProductList = () => {
                             }}
                         />
                         <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '6px' }}>
-                            <span>$0.00</span>
-                            <span>Max Item Limit: ${maxCatalogPrice.toFixed(2)}</span>
+                            <span>₹0.00</span>
+                            <span>Max Item Limit: ₹{maxCatalogPrice.toFixed(2)}</span>
                         </div>
                     </div>
                 )}
@@ -398,7 +398,7 @@ const ProductList = () => {
                         <div key={item._id} className="product-card" style={{animationDelay: `${index * 0.05}s`}}>
                             <div className="product-badge">{item.category}</div>
                             <h3 className="product-name">{item.name}</h3>
-                            <div className="product-price">${formatPrice(item.price)}</div>
+                            <div className="product-price">₹{formatPrice(item.price)}</div>
                             <div className="product-company">by <span>{item.company}</span></div>
                             
                             {/* Purchase Actions */}

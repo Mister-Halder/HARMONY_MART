@@ -120,6 +120,46 @@ const AdminDashboard = () => {
         }
     };
 
+    const deleteUser = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this user?")) return;
+        try {
+            let result = await fetch(`${API_BASE_URL}/admin/user/${id}`, {
+                method: "Delete",
+                headers: {
+                    authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+                }
+            });
+            result = await result.json();
+            if (result) {
+                const updated = users.filter(u => u._id !== id);
+                setUsers(updated);
+            }
+        } catch (err) {
+            console.error("Delete User Error:", err);
+        }
+    };
+
+    const updateUserRole = async (userId, newRole) => {
+        try {
+            let result = await fetch(`${API_BASE_URL}/admin/user-role/${userId}`, {
+                method: "Put",
+                body: JSON.stringify({ role: newRole }),
+                headers: {
+                    "Content-Type": "application/json",
+                    authorization: `bearer ${JSON.parse(localStorage.getItem('token'))}`
+                }
+            });
+            result = await result.json();
+            if (result) {
+                const updatedUsers = users.map(u => u._id === userId ? { ...u, role: newRole } : u);
+                setUsers(updatedUsers);
+                alert(`User role updated to "${newRole}"`);
+            }
+        } catch (err) {
+            console.error("Failed to update user role", err);
+        }
+    };
+
     const searchProduct = async (e) => {
         let key = e.target.value;
         setSearchKey(key);
@@ -144,7 +184,7 @@ const AdminDashboard = () => {
 
     const formatPrice = (price) => {
         if (!price) return "0.00";
-        const clean = String(price).replace(/[$,]/g, '');
+        const clean = String(price).replace(/[₹$,]/g, '');
         const num = parseFloat(clean);
         return isNaN(num) ? "0.00" : num.toFixed(2);
     };
@@ -188,6 +228,26 @@ const AdminDashboard = () => {
                     }}>
                         🛒 Customer Shop
                     </Link>
+                    <button 
+                        onClick={() => {
+                            localStorage.clear();
+                            navigate('/login');
+                        }}
+                        style={{
+                            background: 'rgba(239, 68, 68, 0.2)',
+                            border: '1px solid var(--error-color)',
+                            color: 'var(--error-color)',
+                            padding: '12px 20px',
+                            borderRadius: '8px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            fontSize: '0.9rem',
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}
+                    >
+                        🚪 Logout
+                    </button>
                 </div>
             </div>
 
@@ -229,7 +289,7 @@ const AdminDashboard = () => {
                                 <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)', padding: '25px', borderRadius: '16px', backdropFilter: 'blur(10px)' }}>
                                     <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Total Sales</div>
                                     <div style={{ fontSize: '2rem', fontWeight: '800', marginTop: '10px', color: 'var(--success-color)' }}>
-                                        ${formatPrice(stats.totalSales)}
+                                        ₹{formatPrice(stats.totalSales)}
                                     </div>
                                     <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '8px' }}>Combined order revenues</div>
                                 </div>
@@ -277,7 +337,7 @@ const AdminDashboard = () => {
                                                         <td style={{ padding: '12px' }}>{new Date(order.orderDate).toLocaleDateString()}</td>
                                                         <td style={{ padding: '12px', fontSize: '0.85rem', fontFamily: 'monospace' }}>{order._id}</td>
                                                         <td style={{ padding: '12px', fontSize: '0.85rem', fontFamily: 'monospace' }}>{order.userId}</td>
-                                                        <td style={{ padding: '12px', color: 'var(--success-color)', fontWeight: '600' }}>${formatPrice(order.totalAmount)}</td>
+                                                        <td style={{ padding: '12px', color: 'var(--success-color)', fontWeight: '600' }}>₹{formatPrice(order.totalAmount)}</td>
                                                         <td style={{ padding: '12px' }}>
                                                             <span style={{
                                                                 background: order.status === 'Delivered' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(99, 102, 241, 0.15)',
@@ -344,7 +404,7 @@ const AdminDashboard = () => {
                                                 <tr key={p._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                                                     <td style={{ padding: '12px' }}>{index + 1}</td>
                                                     <td style={{ padding: '12px', fontWeight: '600' }}>{p.name}</td>
-                                                    <td style={{ padding: '12px', color: 'var(--success-color)' }}>${formatPrice(p.price)}</td>
+                                                    <td style={{ padding: '12px', color: 'var(--success-color)' }}>₹{formatPrice(p.price)}</td>
                                                     <td style={{ padding: '12px' }}>{p.category}</td>
                                                     <td style={{ padding: '12px' }}>{p.company}</td>
                                                     <td style={{ padding: '12px' }}>
@@ -415,12 +475,12 @@ const AdminDashboard = () => {
                                                     <td style={{ padding: '12px', fontSize: '0.9rem' }}>
                                                         {o.products && o.products.map((prod, idx) => (
                                                             <div key={idx} style={{ marginBottom: '6px', borderBottom: idx < o.products.length - 1 ? '1px dashed rgba(255,255,255,0.03)' : 'none', paddingBottom: '4px' }}>
-                                                                {prod.name} <span style={{ color: 'var(--text-secondary)' }}>x{prod.quantity}</span> (${formatPrice(prod.price)})
+                                                                {prod.name} <span style={{ color: 'var(--text-secondary)' }}>x{prod.quantity}</span> (₹{formatPrice(prod.price)})
                                                             </div>
                                                         ))}
                                                     </td>
                                                     <td style={{ padding: '12px', color: 'var(--success-color)', fontWeight: '700', fontSize: '1.05rem' }}>
-                                                        ${formatPrice(o.totalAmount)}
+                                                        ₹{formatPrice(o.totalAmount)}
                                                     </td>
                                                     <td style={{ padding: '12px' }}>
                                                         <span style={{
@@ -506,22 +566,45 @@ const AdminDashboard = () => {
                                                     <span>{user.name.charAt(0).toUpperCase()}</span>
                                                 )}
                                             </div>
-                                            <div style={{ overflow: 'hidden' }}>
+                                            <div style={{ overflow: 'hidden', flex: 1 }}>
                                                 <h4 style={{ margin: 0, fontSize: '1.05rem', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{user.name}</h4>
                                                 <p style={{ margin: '4px 0 8px', fontSize: '0.85rem', color: 'var(--text-secondary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{user.email}</p>
-                                                <span style={{
-                                                    background: user.role === 'admin' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(255,255,255,0.05)',
-                                                    border: user.role === 'admin' ? '1px solid var(--secondary-color)' : '1px solid rgba(255,255,255,0.1)',
-                                                    color: user.role === 'admin' ? 'var(--secondary-color)' : 'var(--text-secondary)',
-                                                    padding: '3px 8px',
-                                                    borderRadius: '4px',
-                                                    fontSize: '0.75rem',
-                                                    fontWeight: '700',
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: '0.5px'
-                                                }}>
-                                                    {user.role || 'user'}
-                                                </span>
+                                                
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <select
+                                                        value={user.role || 'user'}
+                                                        onChange={(e) => updateUserRole(user._id, e.target.value)}
+                                                        style={{
+                                                            background: user.role === 'admin' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(255,255,255,0.05)',
+                                                            border: user.role === 'admin' ? '1px solid var(--secondary-color)' : '1px solid rgba(255,255,255,0.1)',
+                                                            color: user.role === 'admin' ? 'var(--secondary-color)' : 'var(--text-secondary)',
+                                                            padding: '4px 8px',
+                                                            borderRadius: '6px',
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: '700',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '0.5px',
+                                                            outline: 'none',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        <option value="user" style={{ background: '#1e1b4b', color: 'var(--text-primary)' }}>User</option>
+                                                        <option value="admin" style={{ background: '#1e1b4b', color: 'var(--text-primary)' }}>Admin</option>
+                                                    </select>
+                                                    
+                                                    <button onClick={() => deleteUser(user._id)} style={{
+                                                        padding: '4px 10px',
+                                                        background: 'rgba(239, 68, 68, 0.2)',
+                                                        color: 'var(--error-color)',
+                                                        borderRadius: '6px',
+                                                        border: '1px solid var(--error-color)',
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: '700',
+                                                        cursor: 'pointer'
+                                                    }}>
+                                                        Delete
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     ))

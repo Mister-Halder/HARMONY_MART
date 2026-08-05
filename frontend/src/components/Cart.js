@@ -13,7 +13,7 @@ const Cart = () => {
 
     const formatPrice = (price) => {
         if (!price) return "0.00";
-        const clean = String(price).replace(/[$,]/g, '');
+        const clean = String(price).replace(/[₹$,]/g, '');
         const num = parseFloat(clean);
         return isNaN(num) ? "0.00" : num.toFixed(2);
     };
@@ -214,10 +214,10 @@ const Cart = () => {
 
                                 <div style={{ textAlign: 'right', minWidth: '100px' }}>
                                     <div style={{ fontSize: '1.4rem', fontWeight: '700', color: 'var(--primary-color)' }}>
-                                        ${(parseFloat(formatPrice(item.price)) * (item.quantity || 1)).toFixed(2)}
+                                        ₹{(parseFloat(formatPrice(item.price)) * (item.quantity || 1)).toFixed(2)}
                                     </div>
                                     <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                        ${formatPrice(item.price)} each
+                                        ₹{formatPrice(item.price)} each
                                     </span>
                                 </div>
 
@@ -276,7 +276,7 @@ const Cart = () => {
 
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', color: 'var(--text-secondary)' }}>
                             <span>Subtotal</span>
-                            <span>${totalAmount}</span>
+                            <span>₹{totalAmount}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', color: 'var(--text-secondary)' }}>
                             <span>Shipping</span>
@@ -284,7 +284,7 @@ const Cart = () => {
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.5rem', fontWeight: '700', borderTop: '1px solid var(--border-color)', paddingTop: '15px', marginBottom: '25px' }}>
                             <span>Total</span>
-                            <span style={{ color: 'var(--primary-color)' }}>${totalAmount}</span>
+                            <span style={{ color: 'var(--primary-color)' }}>₹{totalAmount}</span>
                         </div>
                         <button onClick={handleCheckout} className="appButton" style={{ margin: 0 }}>
                             Proceed to Buy

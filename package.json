@@ -4,10 +4,10 @@
   "description": "Root configuration to manage backend and frontend of the E-Commerce Dashboard",
   "private": true,
   "scripts": {
-    "install-all": "npm install --prefix backend && npm install --prefix front-end",
+    "install-all": "npm install --prefix backend && npm install --prefix frontend",
     "stop-ports": "powershell -Command \"$p3000 = (Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue).OwningProcess | Select-Object -Unique; if ($p3000) { Stop-Process -Id $p3000 -Force -ErrorAction SilentlyContinue }; $p5000 = (Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue).OwningProcess | Select-Object -Unique; if ($p5000) { Stop-Process -Id $p5000 -Force -ErrorAction SilentlyContinue }\"",
     "backend": "npm run dev --prefix backend",
-    "frontend": "npm start --prefix front-end",
+    "frontend": "npm start --prefix frontend",
     "dev": "npm run stop-ports && concurrently \"npm run backend\" \"npm run frontend\""
   },
   "devDependencies": {
