@@ -536,11 +536,7 @@
     }
 
     .register, .login {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        margin: 0;
+        margin: 15vh auto;
         padding: 25px 20px;
         width: 90%;
     }
@@ -606,11 +602,7 @@
     }
 
     .register, .login {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        margin: 0;
+        margin: 15vh auto;
         width: 95%;
         padding: 20px 15px;
     }
