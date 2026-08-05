@@ -6,6 +6,7 @@ const Nav=()=>{
     const navigate = useNavigate();
     const location = useLocation();
     const [cartCount, setCartCount] = useState(0);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         updateCount();
@@ -45,11 +46,17 @@ const Nav=()=>{
         navigate('/signup')
     }
     return(
-        <nav>
-            { auth && user ? <ul className="nav-ul">
-                <li>
-                    <img alt="logo" className='logo' 
-                    src={`${process.env.PUBLIC_URL}/logo.png`} />
+        <nav className="navbar">
+            <div className="mobile-menu-header">
+                { auth && user && <img alt="logo" className='logo mobile-logo' src={`${process.env.PUBLIC_URL}/logo.png`} /> }
+                <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                    {isMobileMenuOpen ? '✖' : '☰'}
+                </button>
+            </div>
+            
+            { auth && user ? <ul className={`nav-ul ${isMobileMenuOpen ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
+                <li className="desktop-logo">
+                    <img alt="logo" className='logo' src={`${process.env.PUBLIC_URL}/logo.png`} />
                 </li>
                 
                 {/* Admin-only Nav links */}
@@ -98,7 +105,7 @@ const Nav=()=>{
                         overflow: 'hidden',
                         border: '2px solid var(--primary-color)',
                         background: 'rgba(255,255,255,0.1)',
-                        marginRight: '-10px', // Pull it closer to the text
+                        marginRight: '-10px',
                         zIndex: 1,
                         display: 'flex',
                         justifyContent: 'center',
@@ -122,7 +129,7 @@ const Nav=()=>{
                 </li>
             </ul>
             :
-            <ul className="nav-ul nav-right">
+            <ul className={`nav-ul nav-right ${isMobileMenuOpen ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)}>
                 <li><Link to="/signup">Sign Up</Link></li>
                 <li><Link to="/login">Login</Link></li>
             </ul>
