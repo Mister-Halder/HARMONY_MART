@@ -437,3 +437,92 @@
         opacity: .5;
     }
 }
+
+/* ----- Responsive Design (Tablets & Mobiles) ----- */
+@media (max-width: 1024px) {
+    .nav-ul {
+        padding: 10px 20px;
+    }
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    .nav-ul li {
+        margin: 0 5px;
+    }
+    
+    .nav-right {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+        margin-top: 5px;
+    }
+
+    .logo {
+        margin-right: 10px;
+        height: 35px;
+    }
+
+    .register, .login, .product {
+        margin: 30px auto;
+        padding: 25px 20px;
+        width: 90%;
+    }
+
+    .register h1, .login h1, .product h1 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+
+    .product-list-container {
+        padding: 10px;
+        margin: 20px auto 70px;
+    }
+
+    .product-list-container h1 {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+        gap: 20px;
+    }
+
+    .product-card {
+        padding: 20px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-ul li a {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
+
+    .nav-right .logout-btn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+    
+    .register h1, .login h1, .product h1 {
+        font-size: 1.5rem;
+    }
+    
+    .product-company {
+        font-size: 0.85rem;
+    }
+    
+    .product-name {
+        font-size: 1.2rem;
+    }
+}
