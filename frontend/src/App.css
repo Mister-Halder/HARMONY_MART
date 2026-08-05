@@ -529,8 +529,18 @@
         height: 35px;
     }
 
-    .register, .login, .product {
+    .product {
         margin: 30px auto;
+        padding: 25px 20px;
+        width: 90%;
+    }
+
+    .register, .login {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
         padding: 25px 20px;
         width: 90%;
     }
@@ -589,10 +599,20 @@
         height: 30px;
     }
 
-    .register, .login, .product {
+    .product {
         width: 95%;
         padding: 20px 15px;
         margin: 20px auto;
+    }
+
+    .register, .login {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
+        width: 95%;
+        padding: 20px 15px;
     }
     
     .inputBox {
