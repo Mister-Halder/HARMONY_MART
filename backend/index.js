@@ -1,8 +1,8 @@
-require('dotenv').config();
+const path = require("path");
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
-const path = require("path");
 require('./db/config');
 const User = require("./db/User");
 const Product = require("./db/Product");
@@ -131,85 +131,90 @@ app.post("/register", async (req, resp) => {
     }
 });
 
-app.post("/login", async (req, resp)=>{
-    console.log(req.body);
-    if (req.body.password && req.body.email) {
-        const email = req.body.email.trim().toLowerCase();
-        const password = req.body.password;
+app.post("/login", async (req, resp) => {
+    try {
+        console.log("Login request body:", req.body);
+        if (req.body.password && req.body.email) {
+            const email = req.body.email.trim().toLowerCase();
+            const password = req.body.password;
 
-        // Hardcoded admin login logic
-        if (email === 'debashishalder10@gmail.com' && password === 'debashishalder10') {
-            let user = await User.findOne({ email });
-            if (!user) {
-                const salt = await bcrypt.genSalt(10);
-                const hashedPassword = await bcrypt.hash(password, salt);
-                user = new User({
-                    name: "Admin Debashis",
-                    email: email,
-                    password: hashedPassword,
-                    role: 'admin'
-                });
-                await user.save();
-            } else {
-                let isMatch = false;
-                try { isMatch = await bcrypt.compare(password, user.password); } catch (e) {}
-                const isPlainMatch = user.password === password;
-                
-                if (user.role !== 'admin' || (!isMatch && !isPlainMatch)) {
+            // Hardcoded admin login logic
+            if (email === 'debashishalder10@gmail.com' && password === 'debashishalder10') {
+                let user = await User.findOne({ email });
+                if (!user) {
                     const salt = await bcrypt.genSalt(10);
-                    user.role = 'admin';
-                    user.password = await bcrypt.hash(password, salt);
+                    const hashedPassword = await bcrypt.hash(password, salt);
+                    user = new User({
+                        name: "Admin Debashis",
+                        email: email,
+                        password: hashedPassword,
+                        role: 'admin'
+                    });
                     await user.save();
-                } else if (isPlainMatch) {
-                    const salt = await bcrypt.genSalt(10);
-                    user.password = await bcrypt.hash(password, salt);
-                    await user.save();
-                }
-            }
-            
-            user = user.toObject();
-            delete user.password;
-
-            Jwt.sign({ user }, jwtKey, { expiresIn: "2h" }, (err, token) => {
-                if (err) {
-                    return resp.status(500).send({ result: "Something went wrong, Please try after sometime" });
-                }
-                resp.send({ user, auth: token });
-            });
-            return;
-        }
-
-        // Standard user login
-        let user = await User.findOne({ email });
-        if (user) {
-            let isMatch = false;
-            try { isMatch = await bcrypt.compare(password, user.password); } catch (e) {}
-            const isPlainMatch = user.password === password;
-
-            if (isMatch || isPlainMatch) {
-                if (isPlainMatch) {
-                    const salt = await bcrypt.genSalt(10);
-                    user.password = await bcrypt.hash(password, salt);
-                    await user.save();
+                } else {
+                    let isMatch = false;
+                    try { isMatch = await bcrypt.compare(password, user.password); } catch (e) {}
+                    const isPlainMatch = user.password === password;
+                    
+                    if (user.role !== 'admin' || (!isMatch && !isPlainMatch)) {
+                        const salt = await bcrypt.genSalt(10);
+                        user.role = 'admin';
+                        user.password = await bcrypt.hash(password, salt);
+                        await user.save();
+                    } else if (isPlainMatch) {
+                        const salt = await bcrypt.genSalt(10);
+                        user.password = await bcrypt.hash(password, salt);
+                        await user.save();
+                    }
                 }
                 
                 user = user.toObject();
                 delete user.password;
-                
+
                 Jwt.sign({ user }, jwtKey, { expiresIn: "2h" }, (err, token) => {
                     if (err) {
                         return resp.status(500).send({ result: "Something went wrong, Please try after sometime" });
                     }
                     resp.send({ user, auth: token });
                 });
+                return;
+            }
+
+            // Standard user login
+            let user = await User.findOne({ email });
+            if (user) {
+                let isMatch = false;
+                try { isMatch = await bcrypt.compare(password, user.password); } catch (e) {}
+                const isPlainMatch = user.password === password;
+
+                if (isMatch || isPlainMatch) {
+                    if (isPlainMatch) {
+                        const salt = await bcrypt.genSalt(10);
+                        user.password = await bcrypt.hash(password, salt);
+                        await user.save();
+                    }
+                    
+                    user = user.toObject();
+                    delete user.password;
+                    
+                    Jwt.sign({ user }, jwtKey, { expiresIn: "2h" }, (err, token) => {
+                        if (err) {
+                            return resp.status(500).send({ result: "Something went wrong, Please try after sometime" });
+                        }
+                        resp.send({ user, auth: token });
+                    });
+                } else {
+                    resp.send({ result: 'No User Found' });
+                }
             } else {
                 resp.send({ result: 'No User Found' });
             }
         } else {
             resp.send({ result: 'No User Found' });
         }
-    } else {
-        resp.send({ result: 'No User Found' });
+    } catch (error) {
+        console.error("Login Error:", error);
+        resp.status(500).send({ result: "Login failed", error: error.message || error });
     }
 });
 
@@ -350,8 +355,10 @@ app.get("/admin/stats", verifyToken, verifyAdmin, async (req, resp) => {
         const totalUsers = await User.countDocuments();
         const totalOrders = await Order.countDocuments();
         
-        const orders = await Order.find();
-        const totalSales = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+        const salesResult = await Order.aggregate([
+            { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+        ]);
+        const totalSales = salesResult.length > 0 ? salesResult[0].total : 0;
 
         const recentOrders = await Order.find().sort({ orderDate: -1 }).limit(5);
 
